@@ -1,0 +1,54 @@
+<!-- 存钱罐 + 金币飞入动画 组件 -->
+<view class="jar-wrap {{jarBounce ? 'jar-bounce' : ''}}" catchtap="onJarTap">
+  <view class="jar">
+    <!-- 耳朵 -->
+    <view class="jar-ear ear-l"></view>
+    <view class="jar-ear ear-r"></view>
+    <!-- 尾巴 -->
+    <view class="jar-tail"></view>
+
+    <!-- 身体 -->
+    <view class="jar-body">
+      <!-- 罐内金币液面 -->
+      <view class="jar-coins" style="height: {{fillPercent}}%;"></view>
+      <!-- 鼻子 -->
+      <view class="jar-snout"><view class="snout-hole"></view><view class="snout-hole"></view></view>
+      <!-- 眼睛 -->
+      <view class="jar-eye eye-l"></view>
+      <view class="jar-eye eye-r"></view>
+    </view>
+
+    <!-- 投币口 -->
+    <view class="jar-slot"></view>
+    <!-- 腿 -->
+    <view class="jar-leg leg-l"></view>
+    <view class="jar-leg leg-r"></view>
+  </view>
+
+  <!-- 收集成功的小星星 -->
+  <view class="jar-spark" wx:if="{{spark}}">
+    <view class="sp sp1"></view>
+    <view class="sp sp2"></view>
+    <view class="sp sp3"></view>
+  </view>
+</view>
+
+<!-- 飞行金币层（覆盖全屏，不拦截点击） -->
+<view class="coin-layer">
+  <view
+    wx:for="{{coins}}"
+    wx:key="id"
+    class="fly-coin"
+    style="left: {{item.x}}px; top: {{item.y}}px; transform: translate({{item.tx}}px, 0); transition-duration: {{item.dur}}ms;"
+  >
+    <view
+      class="coin-move"
+      style="transform: translate(0, {{item.ty}}px); transition-duration: {{item.dur}}ms;"
+      data-id="{{item.id}}"
+      bindtransitionend="onCoinArrive"
+    >
+      <view class="coin-face"><text class="coin-symbol">¥</text></view>
+      <text class="coin-label" wx:if="{{item.label}}">{{item.label}}</text>
+    </view>
+  </view>
+</view>

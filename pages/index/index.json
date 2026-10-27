@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "小攒一笔",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "piggy-jar": "/components/piggy-jar/index"
+  }
+}

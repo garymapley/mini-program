@@ -1,0 +1,4 @@
+{
+  "desc": "记录每一次克制消费，让省下来的钱看得见。",
+  "rules": [{ "action": "allow", "page": "pages/index/index" }]
+}

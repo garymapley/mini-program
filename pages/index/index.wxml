@@ -1,0 +1,70 @@
+<view class="page">
+  <view class="topline"><view class="brand"><text class="brand-icon">✳</text><text>小攒一笔</text></view><view class="topline-right"><text class="guide-entry" bindtap="openGuide">新手指南</text><view class="streak">🔥 连续 {{streak}} 天</view></view></view>
+  <view class="hero">
+    <view class="hero-kicker">{{selectedLabel}} · 给自己点个赞</view>
+    <view class="hero-title">这一天，少花了</view>
+    <view class="total-row"><view class="total-line"><text class="currency">¥</text><text class="total">{{todayTotal}}</text></view><piggy-jar id="jar" amount="{{jarAmount}}" goal="{{200}}" bind:jartap="onJarTap" /></view>
+    <view class="hero-bottom"><text>每一次克制，都值得被记住</text><text class="count-pill">{{count}} 次选择</text></view>
+    <view class="sun sun-one"></view><view class="sun sun-two"></view>
+  </view>
+  <view class="quick-stats">
+    <view class="stat"><text class="stat-label">{{monthLabel}}累计省下</text><text class="stat-value">¥{{monthTotal}}</text></view>
+    <view class="stat-divider"></view>
+    <view class="stat"><text class="stat-label">所选日期的好选择</text><text class="stat-value">{{count}} <text class="unit">次</text></text></view>
+  </view>
+  <view class="balance-card"><view class="balance-copy"><text class="balance-label">微信零钱余额快照</text><text wx:if="{{balance !== ''}}" class="balance-value">¥{{balance}}</text><text wx:else class="balance-placeholder">点此填写当前余额</text></view><button class="balance-edit" bindtap="openBalanceForm">{{balance !== '' ? '更新' : '填写'}}</button><text class="balance-note">{{balanceDate ? '最近手动更新：' + balanceDate : '手动填写 · 不会自动连接微信钱包'}}</text></view>
+  <view class="reference-card">
+    <view class="reference-heading"><view><text class="reference-title">周期参考金额</text><text class="reference-caption">余额快照 + 这段时间记录的少花金额</text></view></view>
+    <view class="period-switch"><view class="period-option {{periodMode === 'week' ? 'period-active' : ''}}" data-mode="week" bindtap="choosePeriod">一周</view><view class="period-option {{periodMode === 'month' ? 'period-active' : ''}}" data-mode="month" bindtap="choosePeriod">一个月</view></view>
+    <view wx:if="{{hasBalance}}" class="reference-content"><view class="reference-total">¥{{referenceAmount}}</view><view class="reference-equation">起点 ¥{{balance}} <text>＋</text> 少花 ¥{{savedSinceSnapshot}}</view><view class="reference-dates">{{referenceStart}} 至 {{referenceEnd}}</view><view class="reference-status">{{periodStatus}}</view><text class="reference-note">更新余额快照会重新开始计算周期；这是参考金额，不是实时钱包余额。</text></view>
+    <view wx:else class="reference-empty">先填写上方余额快照，作为本周期的起点金额。</view>
+  </view>
+  <view class="section-head"><view><text class="section-title">每日记录</text><text class="section-sub">选择日期，查看当天省下的钱</text></view><picker mode="date" value="{{selectedDay}}" end="{{todayDate}}" bindchange="onDateChange"><view class="date-chip">{{selectedLabel}}　⌄</view></picker></view>
+  <view wx:if="{{records.length}}" class="record-list">
+    <view wx:for="{{records}}" wx:key="id" class="record-swipe">
+      <view class="record-actions">
+        <view class="action-btn action-pin" data-index="{{index}}" catchtap="pinRecord">{{item.pinned ? '取消' : '置顶'}}</view>
+        <view class="action-btn action-del" data-id="{{item.id}}" catchtap="deleteRecord">删除</view>
+      </view>
+      <view class="record-card" style="transform: translateX({{item.offset}}px); transition: {{item.animate ? 'transform .22s ease' : 'none'}};" data-index="{{index}}" bindtouchstart="onSwipeStart" bindtouchmove="onSwipeMove" bindtouchend="onSwipeEnd" bindtap="openCard">
+        <view class="record-icon">{{item.category === '饮品' ? '🥤' : item.category === '美食' ? '🍜' : item.category === '购物' ? '🛍️' : item.category === '出行' ? '🚕' : '✨'}}</view>
+        <view class="record-main"><view class="record-title">忍住了{{item.item}}</view><view class="record-time">{{item.date}} · 录入于 {{item.displayTime}}</view></view>
+        <view class="record-right"><text class="record-amount">+¥{{item.displayAmount}}</text></view>
+      </view>
+    </view>
+  </view>
+  <view wx:else class="empty"><view class="empty-art">🌱</view><view class="empty-title">{{isToday ? '今天还没有记录' : selectedLabel + '还没有记录'}}</view><view class="empty-copy">下一次忍住没买，就来记下这份小胜利吧</view></view>
+  <view class="bottom-space"></view>
+  <view class="sticky"><button class="add-button" bindtap="openForm"><text class="plus">＋</text>记下一笔省下的钱</button><text class="privacy-note">记录只保存在这台设备上</text></view>
+  <view wx:if="{{showForm}}" class="mask" bindtap="closeForm">
+    <view class="sheet" catchtap="stopTap">
+      <view class="sheet-handle"></view><view class="sheet-head"><view><text class="sheet-title">记下一次克制</text><text class="sheet-sub">记录日期：{{selectedLabel}} · 你省下的每一块都算数</text></view><text class="close" bindtap="closeForm">×</text></view>
+      <view class="field-label">本来想买什么？</view><input class="input" placeholder="比如：一杯奶茶" maxlength="30" value="{{item}}" bindinput="onItemInput" />
+      <view class="field-label">大约省下多少？</view><view class="amount-input"><text>¥</text><input type="digit" placeholder="0.00" value="{{amount}}" bindinput="onAmountInput" /></view><view class="amount-presets"><view wx:for="{{quickAmounts}}" wx:key="*this" class="amount-preset {{selectedQuickAmount === item ? 'preset-selected' : ''}}" data-amount="{{item}}" bindtap="chooseAmount">¥{{item}}</view></view>
+      <view class="field-label">选择类别</view><view class="categories"><view wx:for="{{categories}}" wx:key="*this" class="category {{activeCategory === item ? 'selected' : ''}}" data-name="{{item}}" bindtap="chooseCategory">{{item}}</view></view>
+      <view class="field-label">备注</view><textarea class="textarea" placeholder="比如：今天想为减肥努力一下" maxlength="80" value="{{reason}}" bindinput="onReasonInput"></textarea>
+      <button class="save-button" bindtap="saveRecord">保存这份好选择</button>
+    </view>
+  </view>
+  <view wx:if="{{showBalanceForm}}" class="mask" bindtap="closeBalanceForm"><view class="sheet balance-sheet" catchtap="stopTap"><view class="sheet-handle"></view><view class="sheet-head"><view><text class="sheet-title">记录微信零钱余额</text><text class="sheet-sub">手动填写微信钱包里显示的余额</text></view><text class="close" bindtap="closeBalanceForm">×</text></view><view class="field-label">当前微信零钱</view><view class="amount-input"><text>¥</text><input type="digit" placeholder="0.00" value="{{balanceInput}}" bindinput="onBalanceInput" /></view><button class="save-button" bindtap="saveBalance">保存余额</button></view></view>
+  <view wx:if="{{showCard}}" class="card-mask" bindtap="closeCard">
+    <view class="gacha gacha-{{cardClass}}" catchtap="stopTap">
+      <view class="gacha-ring gacha-ring-a"></view><view class="gacha-ring gacha-ring-b"></view>
+      <view class="gacha-wm">{{cardEmoji}}</view>
+      <view class="gacha-cat"><view class="gacha-dot"></view>{{cardCategory}}</view>
+      <view class="gacha-body"><text class="gacha-mark">“</text><text class="gacha-quote">{{cardReason}}</text></view>
+      <view class="gacha-foot">忍住了{{cardItem}} · +¥{{cardAmount}}</view>
+    </view>
+  </view>
+  <view wx:if="{{showGuide}}" class="guide-mask">
+    <view class="guide-card">
+      <view class="guide-badge">🌱</view>
+      <view class="guide-title">欢迎来到小攒一笔</view>
+      <view class="guide-sub">电子支付让花钱越来越没感觉，这里帮你把每一次「忍住没买」变成看得见的成就感</view>
+      <view class="guide-step"><view class="guide-num">1</view><view class="guide-text"><text class="guide-step-title">忍住没买时，记一笔</text><text class="guide-step-desc">点下方「记下一笔」，填上想买的东西和大约省下的金额</text></view></view>
+      <view class="guide-step"><view class="guide-num">2</view><view class="guide-text"><text class="guide-step-title">回看今天、本月攒了多少</text><text class="guide-step-desc">首页实时汇总，切换日期还能翻看历史记录</text></view></view>
+      <view class="guide-step"><view class="guide-num">3</view><view class="guide-text"><text class="guide-step-title">填一次零钱余额，看攒钱参考</text><text class="guide-step-desc">一周 / 一个月周期金额，加上连续打卡天数，攒钱更有动力</text></view></view>
+      <button class="guide-btn" bindtap="closeGuide">开始攒钱</button>
+    </view>
+  </view>
+</view>

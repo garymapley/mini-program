@@ -1,0 +1,12 @@
+{
+  "pages": ["pages/index/index"],
+  "window": {
+    "navigationBarTitleText": "小攒一笔",
+    "navigationBarBackgroundColor": "#f7f8f2",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f7f8f2",
+    "backgroundTextStyle": "light"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
